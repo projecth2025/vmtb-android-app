@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "vMTB",
+    "slug": "vmtb",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "scheme": "vmtb",
+    "android": {
+      "package": "com.harishbabu2007.vmtb",
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-web-browser"
+    ],
+    "owner": "harishbabu2007",
+    "extra": {
+      "eas": {
+        "projectId": "42f4dd3c-4f9f-4365-a695-8f3e03eead93"
+      }
+    }
+  }
+}

@@ -1,0 +1,1 @@
+# vMTB Android\n\nExpo Go auth testing:\n\n    source ~/.nvm/nvm.sh\n    nvm use 24\n    cd /home/harish/Code/DCP/vmtb-android-app\n    npx expo start --go --tunnel --clear\n\nSupabase Auth URL Configuration must allow:\n\n- vmtb://auth/callback\n- exp://**/--/auth/callback\n
