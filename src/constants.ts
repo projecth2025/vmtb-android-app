@@ -1,0 +1,16 @@
+export const PROFESSIONS = [
+  'Medical oncologist',
+  'Surgical oncologist',
+  'Radiation oncologist',
+  'Hematologist-oncologist',
+  'Radiologist',
+  'Pathologist',
+  'Molecular pathologist',
+  'Oncology nurse / staff nurse',
+  'Oncology pharmacist',
+  'Palliative care specialist',
+  'Genetic counselor',
+  'Administrative staff',
+  'Geneticist',
+  'Genomicist',
+];

@@ -1,0 +1,29 @@
+diff --git a/node_modules/@jitsi/react-native-sdk/react/features/mobile/external-api/functions.ts b/node_modules/@jitsi/react-native-sdk/react/features/mobile/external-api/functions.ts
+index d68c1a4..2f1c12b 100644
+--- a/node_modules/@jitsi/react-native-sdk/react/features/mobile/external-api/functions.ts
++++ b/node_modules/@jitsi/react-native-sdk/react/features/mobile/external-api/functions.ts
+@@ -18,7 +18,8 @@ import { readyToClose } from './actions';
+  * @returns {void}
+  */
+ export function sendEvent(store: Object, name: string, data: Object) {
+-    NativeModules.ExternalAPI.sendEvent(name, data);
++    // Android ships no ExternalAPI native module, so this can be null/undefined.
++    NativeModules.ExternalAPI?.sendEvent(name, data);
+ }
+ 
+ /**
+diff --git a/node_modules/@jitsi/react-native-sdk/react/features/mobile/react-native-sdk/functions.js b/node_modules/@jitsi/react-native-sdk/react/features/mobile/react-native-sdk/functions.js
+index 7286517..0649209 100644
+--- a/node_modules/@jitsi/react-native-sdk/react/features/mobile/react-native-sdk/functions.js
++++ b/node_modules/@jitsi/react-native-sdk/react/features/mobile/react-native-sdk/functions.js
+@@ -9,5 +9,9 @@ import { NativeModules } from 'react-native';
+ export function isExternalAPIAvailable() {
+     const { ExternalAPI } = NativeModules;
+ 
+-    return ExternalAPI !== null;
++    // NB: Android ships no ExternalAPI native module, so this resolves to
++    // `undefined`. The original `!== null` check therefore returned true,
++    // registering the external-api middleware whose sendEvent() then
++    // dereferenced the missing module (the "sendEvent of null" crash).
++    return ExternalAPI != null;
+ }

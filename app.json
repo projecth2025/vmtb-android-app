@@ -8,10 +8,23 @@
     "scheme": "vmtb",
     "android": {
       "package": "com.harishbabu2007.vmtb",
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "softwareKeyboardLayoutMode": "resize",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.INTERNET"
+      ]
     },
     "plugins": [
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-audio",
+      "expo-sharing",
+      "expo-asset",
+      "@config-plugins/react-native-webrtc",
+      "./plugins/with-jitsi-gradle-plugin-version",
+      "expo-status-bar"
     ],
     "owner": "harishbabu2007",
     "extra": {

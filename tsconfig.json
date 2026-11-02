@@ -1,6 +1,9 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
+    "strict": true,
+    "paths": {
+      "@jitsi/react-native-sdk": ["./src/jitsi-sdk.d.ts"]
+    }
   }
 }

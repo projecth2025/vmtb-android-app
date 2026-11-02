@@ -4,28 +4,95 @@
   "private": true,
   "main": "index.ts",
   "scripts": {
-    "start": "expo start --go",
-    "android": "expo start --go --android",
-    "tunnel": "expo start --go --tunnel --clear",
-    "typecheck": "tsc --noEmit"
+    "start": "expo start --dev-client",
+    "android": "expo start --dev-client --android",
+    "tunnel": "expo start --dev-client --tunnel --clear",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "patch-package"
   },
   "dependencies": {
+    "@amplitude/analytics-react-native": "1.5.16",
+    "@giphy/react-native-sdk": "5.0.1",
+    "@jitsi/react-native-sdk": "^13.3.0",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-clipboard/clipboard": "1.16.3",
+    "@react-native-community/netinfo": "12.0.1",
+    "@react-native-community/slider": "5.2.1",
+    "@react-native-google-signin/google-signin": "10.1.0",
+    "@sayem314/react-native-keep-awake": "1.4.0",
     "@supabase/supabase-js": "^2.95.3",
-    "expo": "~58.0.0",
-    "expo-auth-session": "~58.0.14",
-    "expo-dev-client": "~58.0.15",
-    "expo-linking": "~58.0.14",
+    "expo": "~58.0.22",
+    "expo-asset": "~58.0.19",
+    "expo-audio": "~58.0.11",
+    "expo-auth-session": "~58.0.16",
+    "expo-dev-client": "~58.0.18",
+    "expo-document-picker": "~58.0.4",
+    "expo-file-system": "~58.0.13",
+    "expo-image-picker": "~58.0.10",
+    "expo-linking": "~58.0.15",
+    "expo-sharing": "~58.0.21",
     "expo-status-bar": "~58.0.4",
-    "expo-web-browser": "~58.0.6",
+    "expo-web-browser": "~58.0.7",
+    "lucide-react-native": "^1.61.0",
+    "pdf-lib": "^1.17.1",
     "react": "19.3.0",
-    "react-native": "0.88.0",
-    "react-native-safe-area-context": "~5.6.2",
+    "react-native": "0.88.1",
+    "react-native-background-timer": "https://github.com/jitsi/react-native-background-timer.git#d180dfaa4486ae3ee17d01242db92cb3195f4718",
+    "react-native-calendar-events": "https://github.com/jitsi/react-native-calendar-events.git#47f068dedfed7c0f72042e093f688eb11624eb7b",
+    "react-native-default-preference": "https://github.com/jitsi/react-native-default-preference.git#c9bf63bdc058e3fa2aa0b87b1ee1af240f44ed02",
+    "react-native-device-info": "14.1.1",
+    "react-native-gesture-handler": "~3.3.0",
+    "react-native-get-random-values": "1.11.0",
+    "react-native-orientation-locker": "https://github.com/jitsi/react-native-orientation-locker.git#0c42e6f8e9d86397b14b3f03f0ed9b2b73211333",
+    "react-native-pager-view": "9.0.7",
+    "react-native-performance": "6.0.0",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-screens": "~4.30.1",
+    "react-native-sound": "https://github.com/jitsi/react-native-sound.git#bc92152667a628120374c1324fc9e44f697c3192",
+    "react-native-splash-view": "0.0.22",
     "react-native-svg": "15.16.0",
-    "react-native-url-polyfill": "^2.0.0"
+    "react-native-url-polyfill": "^2.0.0",
+    "react-native-video": "6.19.1",
+    "react-native-webrtc": "155.0.0",
+    "react-native-webview": "14.0.1",
+    "react-native-worklets-core": "https://github.com/jitsi/react-native-worklets-core.git#8b20145466186a369d13dd38e979642035a9bda1",
+    "reselect": "5.2.0"
   },
   "devDependencies": {
-    "typescript": "~6.0.3",
-    "@types/react": "~19.3.0"
+    "@babel/plugin-proposal-nullish-coalescing-operator": "7.18.6",
+    "@babel/plugin-proposal-optional-chaining": "7.21.0",
+    "@babel/plugin-transform-arrow-functions": "^8.0.1",
+    "@babel/plugin-transform-shorthand-properties": "^8.0.1",
+    "@babel/plugin-transform-template-literals": "^8.0.1",
+    "@config-plugins/react-native-webrtc": "^15.0.2",
+    "@types/react": "~19.3.0",
+    "patch-package": "^8.0.1",
+    "react-native-svg-transformer": "1.5.3",
+    "typescript": "~6.0.3"
+  },
+  "overrides": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "ws": "8.22.1"
+  },
+  "expo": {
+    "install": {
+      "exclude": [
+        "react-native-webrtc"
+      ]
+    },
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "@amplitude/analytics-react-native",
+          "@jitsi/react-native-sdk",
+          "@sayem314/react-native-keep-awake",
+          "react-native-background-timer",
+          "react-native-calendar-events",
+          "react-native-default-preference",
+          "react-native-orientation-locker",
+          "react-native-webrtc"
+        ]
+      }
+    }
   }
 }
