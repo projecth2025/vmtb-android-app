@@ -13,11 +13,12 @@ export function FormModal({ visible, title, onClose, children }: FormModalProps)
   return (
     <Modal transparent visible={visible} animationType="slide" onRequestClose={onClose}>
       {/* RN Modal renders in its own root, outside Page's KeyboardAvoidingView, so
-          it needs its own avoidance. Android relies on softwareKeyboardLayoutMode
-          resize (app.json); iOS pads. The ScrollView keeps a focused field in view. */}
+          it needs its own avoidance. Android gets the same 'height' behavior as
+          AuthFlow (its window doesn't reliably inherit the app's resize mode);
+          iOS pads. The ScrollView keeps a focused field in view. */}
       <KeyboardAvoidingView
         style={styles.modalShade}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView
           contentContainerStyle={styles.modalScroll}

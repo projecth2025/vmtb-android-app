@@ -80,7 +80,12 @@ export class MeetingService {
       console.info('[meeting] Activation backend status:', data.status, data.components ?? {});
       return data;
     } catch (error) {
-      console.error('[meeting] Activation request failed:', error);
+      const aborted = error instanceof Error && (error.name === 'AbortError' || controller.signal.aborted);
+      // Cleanup aborts the in-flight request on unmount/exit; that is expected
+      // and must not be logged or treated as a failure.
+      if (!(aborted && this.isCleanedUp)) {
+        console.error('[meeting] Activation request failed:', error);
+      }
       throw error;
     } finally {
       clearTimeout(timeoutId);
@@ -126,6 +131,7 @@ export class MeetingService {
           }
           // `starting` -> keep polling; components map drives the loader UI.
         } catch {
+          if (this.isCleanedUp) return;
           consecutiveErrors++;
           consecutiveReadyResponses = 0;
           if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {

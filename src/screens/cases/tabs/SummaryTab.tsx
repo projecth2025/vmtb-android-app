@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Alert, Text, View } from 'react-native';
 import Markdown from 'react-native-markdown-display';
+import { CheckCircle } from 'lucide-react-native';
 import { styles } from '../../../theme/styles';
 import { CaseDetail, VerifiedSnapshot } from '../../../types';
 import { saveSummary } from '../../../lib/api/cases';
@@ -133,7 +134,6 @@ export function SummaryTab({
     <View>
       <View style={styles.statusBox}>
         <Pill label={record.summary_status ?? 'processing'} active={record.summary_status === 'verified'} />
-        <Text style={styles.muted}>Documents: {record.report_status ?? 'not ready'}</Text>
       </View>
       {failed && (
         <View style={styles.statusBox}>
@@ -205,6 +205,21 @@ export function SummaryTab({
           onPress={() => void retry()}
           disabled={busy}
         />
+      )}
+      {/* Web parity: after reading the summary, the owner is invited to lock it. */}
+      {editable && !editing && !isProcessing && record.summary_status === 'unverified' && (
+        <View style={styles.verifyBanner}>
+          <View style={styles.verifyBannerRow}>
+            <CheckCircle size={20} color="#4A90E2" style={styles.verifyBannerIcon} />
+            <View style={styles.verifyBannerText}>
+              <Text style={styles.verifyBannerTitle}>Done reviewing?</Text>
+              <Text style={styles.muted}>
+                Verifying locks the summary above and lets you share this case with an MTB.
+              </Text>
+            </View>
+          </View>
+          <Button title="Verify Case" onPress={verify} disabled={busy} />
+        </View>
       )}
       {editable && !editing && !isProcessing && record.summary_status !== 'verified' && (
         <Button title="Edit summary" onPress={() => setEditing(true)} disabled={busy} />

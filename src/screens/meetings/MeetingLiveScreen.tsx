@@ -27,6 +27,7 @@ const JITSI_CONFIG = {
 
 const JITSI_FLAGS = {
   'prejoinpage.enabled': true,
+  'pip.enabled': false,
 };
 
 /**

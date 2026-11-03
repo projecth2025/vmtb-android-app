@@ -20,9 +20,7 @@ export function CaseCard({ item, onPress, trailing }: CaseCardProps) {
         {item.cancer_type || 'Cancer type not set'}
         {item.patient_name ? ` · ${item.patient_name}` : ''}
       </Text>
-      <Text style={styles.muted}>
-        {new Date(item.created_at).toLocaleDateString()} · Reports: {item.report_status ?? 'not ready'}
-      </Text>
+      <Text style={styles.muted}>{new Date(item.created_at).toLocaleDateString()}</Text>
       {trailing ? (
         <Pressable onPress={trailing.onPress} style={styles.trailingButton}>
           <Text style={styles.link}>{trailing.label}</Text>

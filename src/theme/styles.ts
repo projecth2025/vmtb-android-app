@@ -266,6 +266,8 @@ export const styles = StyleSheet.create({
     padding: 15,
     gap: 8,
   },
+  /** Web parity: sibling cards in a stack (space-y-6). */
+  cardStack: { gap: 14 },
   caseCard: {
     backgroundColor: '#fff',
     borderWidth: 1,
@@ -345,14 +347,32 @@ export const styles = StyleSheet.create({
   },
   errorBoxText: { color: '#991b1b', flex: 1, fontSize: 13 },
   statusBox: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  /** End-of-summary verify prompt (web ViewCase "Done reviewing?" banner). */
+  verifyBanner: {
+    gap: 12,
+    padding: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#4A90E2',
+    backgroundColor: '#eaf2fe',
+    marginTop: 6,
+  },
+  verifyBannerRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  verifyBannerIcon: { marginTop: 2 },
+  verifyBannerText: { flex: 1, gap: 2 },
+  verifyBannerTitle: { fontSize: 14, fontWeight: '600', color: '#111827' },
+  /** Question card is a stack, not a row: a row layout pushed the question
+      text past the screen edge. The head row keeps the icon beside the text. */
   questionCard: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
     gap: 8,
     borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
     backgroundColor: '#fff',
     padding: 12,
   },
+  questionHead: { flexDirection: 'row', alignItems: 'flex-start', gap: 9 },
+  questionHeadText: { flex: 1, color: '#344054', fontSize: 14, lineHeight: 21 },
   opinion: {
     padding: 12,
     backgroundColor: '#fff',

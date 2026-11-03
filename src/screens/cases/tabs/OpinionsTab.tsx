@@ -343,9 +343,9 @@ export function OpinionsTab({
             .sort(byCreated);
           return (
             <View key={item.id} style={styles.questionCard}>
-              <View style={styles.row}>
+              <View style={styles.questionHead}>
                 <MessageCircle size={16} color="#4A90E2" />
-                <Text style={styles.bodyText}>{item.question_text}</Text>
+                <Text style={styles.questionHeadText}>{item.question_text}</Text>
               </View>
               <View style={styles.filterRow}>
                 <Pill label="Clinical" active />

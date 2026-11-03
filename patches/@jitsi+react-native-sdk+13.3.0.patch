@@ -1,3 +1,18 @@
+diff --git a/node_modules/@jitsi/react-native-sdk/android/src/main/java/org/jitsi/meet/sdk/PictureInPictureModule.java b/node_modules/@jitsi/react-native-sdk/android/src/main/java/org/jitsi/meet/sdk/PictureInPictureModule.java
+index 4a95846..37e5355 100644
+--- a/node_modules/@jitsi/react-native-sdk/android/src/main/java/org/jitsi/meet/sdk/PictureInPictureModule.java
++++ b/node_modules/@jitsi/react-native-sdk/android/src/main/java/org/jitsi/meet/sdk/PictureInPictureModule.java
+@@ -124,8 +124,8 @@ class PictureInPictureModule extends ReactContextBaseJavaModule {
+         try {
+             enterPictureInPicture();
+             promise.resolve(null);
+-        } catch (RuntimeException re) {
+-            promise.reject(re);
++        } catch (Exception e) {
++            promise.reject(e);
+         }
+     }
+ 
 diff --git a/node_modules/@jitsi/react-native-sdk/react/features/mobile/external-api/functions.ts b/node_modules/@jitsi/react-native-sdk/react/features/mobile/external-api/functions.ts
 index d68c1a4..2f1c12b 100644
 --- a/node_modules/@jitsi/react-native-sdk/react/features/mobile/external-api/functions.ts

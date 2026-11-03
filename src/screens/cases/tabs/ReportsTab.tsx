@@ -491,7 +491,16 @@ export function ReportsTab({
 
       {owner && (
         <View style={styles.row}>
-          <Pressable onPress={() => setMode('edit')} style={styles.row}>
+          <Pressable
+            onPress={() =>
+              Alert.alert(
+                'Edit redactions',
+                'Editing redactions can be done on the website only. Open this case in a browser to edit its redactions.',
+                [{ text: 'OK' }],
+              )
+            }
+            style={styles.row}
+          >
             <Pencil size={16} color="#2f6fc4" />
             <Text style={styles.link}>Edit redactions</Text>
           </Pressable>

@@ -188,7 +188,7 @@ export function CaseSettingsTab({
   if (loading) return <Loading label="Loading settings…" />;
 
   return (
-    <View>
+    <View style={styles.cardStack}>
       {/* MTB sharing: every MTB the case is in, each removable, plus add to more */}
       <View style={styles.cardPanel}>
         <View style={styles.rowBetween}>

@@ -69,7 +69,7 @@ export function MeetingDetailScreen({ meetingId, activeMtbId, onBack }: FeatureS
         <>
           <View style={styles.codeCard}>
             <Text style={styles.label}>Minutes of Meeting</Text>
-          <Pill label={transcript?.status ?? 'pending'} active={momStatus === 'completed' || !!mom} />
+          <Pill label={(transcript?.status ?? 'pending').toLowerCase()} active={momStatus === 'completed' || !!mom} />
           </View>
           {mom ? (
             <Text style={styles.bodyText}>{mom}</Text>

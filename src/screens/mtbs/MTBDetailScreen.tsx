@@ -247,7 +247,10 @@ export function MTBDetailScreen({ mtbId, userId, role, profile, effectiveOwnerId
               const momRow = transcripts.find(
                 (row) => row.session_id === item.id || row.meeting_id === item.id,
               );
-              const momStatus = momRow?.status ?? momRow?.mom_status ?? null;
+              const momStatusRaw = momRow?.status ?? momRow?.mom_status ?? null;
+              const momStatus = momStatusRaw ? String(momStatusRaw).toLowerCase() : null;
+              const hasMom = !!(momRow?.mom || momRow?.minutes_of_meeting || momRow?.mom_text);
+              const isCompleted = item.status !== 'active' && (momStatus === 'completed' || hasMom);
               return (
                 <Pressable
                   key={item.id}
@@ -261,7 +264,7 @@ export function MTBDetailScreen({ mtbId, userId, role, profile, effectiveOwnerId
                     <Text style={styles.cardTitle}>{new Date(item.started_at).toLocaleString()}</Text>
                     <Pill
                       label={momStatus ?? (item.status === 'active' ? 'live' : 'ended')}
-                      active={item.status === 'active' || momStatus === 'completed'}
+                      active={item.status === 'active' || isCompleted}
                     />
                   </View>
                   <Text style={styles.muted}>

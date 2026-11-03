@@ -13,7 +13,9 @@ export function Page({ title, onBack, action, children }: PageProps) {
   return (
     <KeyboardAvoidingView
       style={styles.page}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      // Match AuthFlow (verified working on device): Android pads by keyboard
+      // height so a focused field near the bottom never sits under the keyboard.
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.pageHeader}>
         <Pressable onPress={onBack} style={styles.backButton} accessibilityLabel="Go back">
