@@ -13,6 +13,7 @@ import { styles } from '../../../theme/styles';
 import { CaseDetail } from '../../../types';
 import {
   LocalChange,
+  RedactionBBox,
   RedactionRegion,
   RedactionStyle,
   commitCaseEdits,
@@ -30,12 +31,20 @@ const STYLE_LABELS: { style: RedactionStyle; label: string }[] = [
   { style: 'blur', label: 'Blur' },
 ];
 
-function normalizeBBox(x0: number, y0: number, x1: number, y1: number): [number, number, number, number] {
-  const x = Math.min(x0, x1);
-  const y = Math.min(y0, y1);
-  const w = Math.abs(x1 - x0);
-  const h = Math.abs(y1 - y0);
-  return [x, y, w, h];
+function normalizeBBox(x0: number, y0: number, x1: number, y1: number): RedactionBBox {
+  return {
+    x0: Math.min(x0, x1),
+    y0: Math.min(y0, y1),
+    x1: Math.max(x0, x1),
+    y1: Math.max(y0, y1),
+  };
+}
+
+function bboxWidth(bbox: RedactionBBox) {
+  return bbox.x1 - bbox.x0;
+}
+function bboxHeight(bbox: RedactionBBox) {
+  return bbox.y1 - bbox.y0;
 }
 
 export function DocumentEditor({
@@ -104,14 +113,14 @@ export function DocumentEditor({
           return;
         }
         const bbox = normalizeBBox(start.x, start.y, end.x, end.y);
-        if (bbox[2] < 0.01 || bbox[3] < 0.01) {
+        if (bboxWidth(bbox) < 0.01 || bboxHeight(bbox) < 0.01) {
           setDrawStart(null);
           setDrawEnd(null);
           return;
         }
         const region: RedactionRegion = {
           id: `local-${Date.now()}`,
-          page: pageIndexRef.current + 1,
+          page: pageIndexRef.current,
           bbox,
           style: styleRef.current,
           source: 'manual',
@@ -142,6 +151,9 @@ export function DocumentEditor({
         if (!alive) return;
         setFiles(reportFiles.map((file) => ({ filename: file.filename })));
         if (reportFiles[0]) setSelected(reportFiles[0].filename);
+      })
+      .catch((e) => {
+        if (alive) setError(errorMessage(e, 'Could not load the report files.'));
       })
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
@@ -174,7 +186,7 @@ export function DocumentEditor({
   );
   const visibleRegions = [
     ...savedRegions.filter((region) => !stagedRemovals.has(region.id)),
-    ...stagedAdditions.filter((region) => region.page === pageIndex + 1),
+    ...stagedAdditions.filter((region) => region.page === pageIndex),
   ];
 
   const removeStaged = (regionId: string) => {
@@ -282,17 +294,17 @@ export function DocumentEditor({
               resizeMode="contain"
             />
             {visibleRegions
-              .filter((region) => region.page === pageIndex + 1)
+              .filter((region) => region.page === pageIndex)
               .map((region) => (
                 <View
                   key={region.id}
                   pointerEvents="box-none"
                   style={{
                     position: 'absolute',
-                    left: region.bbox[0] * contentWidth,
-                    top: region.bbox[1] * contentHeight,
-                    width: region.bbox[2] * contentWidth,
-                    height: region.bbox[3] * contentHeight,
+                    left: region.bbox.x0 * contentWidth,
+                    top: region.bbox.y0 * contentHeight,
+                    width: bboxWidth(region.bbox) * contentWidth,
+                    height: bboxHeight(region.bbox) * contentHeight,
                     backgroundColor:
                       region.style === 'whiteout'
                         ? '#ffffff'
@@ -309,10 +321,10 @@ export function DocumentEditor({
                 pointerEvents="none"
                 style={{
                   position: 'absolute',
-                  left: previewBBox[0] * contentWidth,
-                  top: previewBBox[1] * contentHeight,
-                  width: previewBBox[2] * contentWidth,
-                  height: previewBBox[3] * contentHeight,
+                  left: previewBBox.x0 * contentWidth,
+                  top: previewBBox.y0 * contentHeight,
+                  width: bboxWidth(previewBBox) * contentWidth,
+                  height: bboxHeight(previewBBox) * contentHeight,
                   borderWidth: 1,
                   borderColor: '#4A90E2',
                   backgroundColor: 'rgba(74,144,226,0.15)',
@@ -340,11 +352,11 @@ export function DocumentEditor({
         <>
           <Text style={styles.label}>Redactions on this page</Text>
           {visibleRegions
-            .filter((region) => region.page === pageIndex + 1)
+            .filter((region) => region.page === pageIndex)
             .map((region) => (
               <View key={region.id} style={styles.rowBetween}>
                 <Text style={styles.bodyText}>
-                  Page {region.page} · {region.style} · {region.source ?? 'manual'}
+                  Page {region.page + 1} · {region.style} · {region.source ?? 'manual'}
                 </Text>
                 <Pressable onPress={() => removeStaged(region.id)}>
                   <Text style={styles.link}>Remove</Text>

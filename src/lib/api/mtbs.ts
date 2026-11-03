@@ -3,6 +3,8 @@ import { MTB, Role } from '../../types';
 import { randomJoinCode } from './config';
 import { fetchCases } from './cases';
 
+type MtbBoardRow = { id: string; name: string; owner_id: string };
+
 export async function fetchMTBs(userId: string, role: Role, linkedClinicianId: string | null): Promise<MTB[]> {
   const ownerId = role === 'site_data_coordinator' ? linkedClinicianId : userId;
   const ownedQuery = ownerId
@@ -120,19 +122,52 @@ export async function fetchMtbSharedCases(caseIds: string[]) {
   return data ?? [];
 }
 
-export async function fetchOwnedMtbBoards(ownerId: string | null): Promise<{ id: string; name: string }[]> {
-  if (!ownerId) return [];
-  const { data, error } = await supabase
-    .from('mtbs')
-    .select('id, name')
-    .eq('owner_id', ownerId)
-    .order('name');
-  if (error) throw error;
-  return data ?? [];
+/**
+ * Every MTB this account can share a case to: boards owned by the effective
+ * owner (SDC: the linked clinician) plus the user's own memberships — the same
+ * set the web's `mtbs` context offers in "Add to MTBs".
+ */
+export async function fetchShareableMtbBoards(
+  userId: string,
+  effectiveOwnerId: string | null,
+): Promise<{ id: string; name: string; owner_id: string }[]> {
+  const [ownedResult, membershipResult] = await Promise.all([
+    effectiveOwnerId
+      ? supabase.from('mtbs').select('id, name, owner_id').eq('owner_id', effectiveOwnerId).order('name')
+      : Promise.resolve({ data: [], error: null } as { data: { id: string; name: string; owner_id: string }[]; error: null }),
+    supabase.from('mtb_members').select('mtb_id').eq('user_id', userId),
+  ]);
+  if (ownedResult.error) throw ownedResult.error;
+  if (membershipResult.error) throw membershipResult.error;
+  const memberIds = (membershipResult.data ?? []).map((row: { mtb_id: string }) => row.mtb_id);
+  const memberResult = memberIds.length
+    ? await supabase.from('mtbs').select('id, name, owner_id').in('id', memberIds).order('name')
+    : { data: [], error: null } as { data: { id: string; name: string; owner_id: string }[]; error: null };
+  if (memberResult.error) throw memberResult.error;
+  return [...new Map(
+    [...(ownedResult.data ?? []), ...(memberResult.data ?? [])].map((board) => [board.id, board]),
+  ).values()];
 }
 
-export async function fetchCaseMtbIdsLocal(caseId: string): Promise<string[]> {
-  const { data, error } = await supabase.from('mtb_cases').select('mtb_id').eq('case_id', caseId);
+/** MTBs the case is currently shared with, with owner for the Owner/Member badge. */
+export async function fetchCaseSharedMtbs(caseId: string): Promise<MtbBoardRow[]> {
+  const { data, error } = await supabase
+    .from('mtb_cases')
+    .select('mtb_id, mtbs ( id, name, owner_id )')
+    .eq('case_id', caseId);
   if (error) throw error;
-  return (data ?? []).map((row: { mtb_id: string }) => row.mtb_id);
+  return (data ?? []).flatMap((row: { mtbs: MtbBoardRow | MtbBoardRow[] | null }) => {
+    const board = Array.isArray(row.mtbs) ? row.mtbs[0] : row.mtbs;
+    return board?.id ? [board] : [];
+  });
+}
+
+/** Bulk-share a case to several MTBs in one insert (web `addCaseToMTBs`). */
+export async function addCaseToMtbs(caseId: string, mtbIds: string[], role: Role) {
+  if (mtbIds.length === 0) return;
+  if (role === 'mtb_expert') throw new Error('MTB Experts cannot add cases to an MTB');
+  const { error } = await supabase
+    .from('mtb_cases')
+    .insert(mtbIds.map((mtbId) => ({ mtb_id: mtbId, case_id: caseId })));
+  if (error) throw error;
 }

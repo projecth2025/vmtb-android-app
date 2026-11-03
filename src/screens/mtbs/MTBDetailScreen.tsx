@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, Pressable, Switch, Text, View } from 'react-native';
-import { FolderOpen, Users } from 'lucide-react-native';
+import { FolderOpen } from 'lucide-react-native';
 import { styles } from '../../theme/styles';
 import { CaseSummary, FeatureScreenProps, MeetingSession } from '../../types';
 import {

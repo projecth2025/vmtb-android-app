@@ -1,6 +1,6 @@
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { styles } from '../../theme/styles';
-import { AuthButton, ErrorText, PhoneFields, Field, Brand } from '../../components/ui';
+import { AuthButton, ErrorText, PhoneFields, Field } from '../../components/ui';
 
 interface LoginScreenProps {
   onGoogle: () => void;

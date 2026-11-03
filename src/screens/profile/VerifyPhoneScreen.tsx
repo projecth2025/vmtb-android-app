@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { Alert, Pressable, Text } from 'react-native';
 import { styles } from '../../theme/styles';
 import { Screen } from '../../types';
 import { cleanPhone } from '../../lib/phone';

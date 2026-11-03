@@ -88,7 +88,6 @@ src/
 │   │                      treatment, profile, feedback, uploads, pipeline, redaction…)
 │   ├── meeting/           Jitsi runtime: config, meetingService, meetingAnalytics, meetingIdentity
 │   └── supabase.ts        Client + callFunction
-├── services/              voiceTranscription (audio transcription)
 ├── theme/styles.ts        Design tokens
 ├── types.ts, src/data/    Shared types and reference data
 ```
@@ -166,5 +165,4 @@ install, check `patches/` and the `postinstall` script first.
 Partial parity — inspect `docs/FEATURES.md` and the web app before assuming a feature is complete:
 
 - Applied dark/system palettes (the preference is saved but not applied)
-- Voice dictation outside case explanation
 - Onboarding

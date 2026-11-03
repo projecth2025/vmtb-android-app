@@ -1,4 +1,4 @@
-import { KeyboardTypeOptions, TextInput, TextInputProps, View, Text } from 'react-native';
+import { TextInput, TextInputProps, View, Text } from 'react-native';
 import { styles } from '../../theme/styles';
 
 interface InputProps extends Omit<TextInputProps, 'style'> {

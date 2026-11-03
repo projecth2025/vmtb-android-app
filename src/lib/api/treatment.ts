@@ -31,12 +31,22 @@ export async function fetchTreatmentFollowUps(treatmentPlanId: string): Promise<
 }
 
 export async function addTreatmentFollowUp(values: {
+  id?: string;
   treatment_plan_id: string;
   followup_date: string;
   disease_progression_date?: string | null;
-  current_patient_status: string;
+  current_patient_status?: string | null;
+  discontinuation_or_ltfu_reason?: string | null;
   additional_clinical_notes?: string | null;
 }): Promise<void> {
-  const { error } = await supabase.from('case_treatment_followups').insert(values);
+  const { id, ...payload } = values;
+  const result = id
+    ? await supabase.from('case_treatment_followups').update(payload).eq('id', id)
+    : await supabase.from('case_treatment_followups').insert(payload);
+  if (result.error) throw result.error;
+}
+
+export async function deleteTreatmentFollowUp(id: string): Promise<void> {
+  const { error } = await supabase.from('case_treatment_followups').delete().eq('id', id);
   if (error) throw error;
 }

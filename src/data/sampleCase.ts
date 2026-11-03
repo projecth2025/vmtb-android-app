@@ -45,16 +45,18 @@ export const SAMPLE_OPINION = {
     'EGFR exon 19 deletion with stage IVA disease: first-line osimertinib is the preferred option. The TP53 co-mutation may shorten response duration, so plan closer imaging follow-up.',
 };
 
+// Web's SAMPLE_TREATMENT_PLAN, field for field.
 export const SAMPLE_TREATMENT = {
   discussionDate: 'Board discussion (sample)',
   recommendation: 'Osimertinib 80 mg once daily as first-line therapy.',
   pathway: 'EGFR-targeted therapy',
-  evidence: 'Strong (Tier I / ESCAT I-A)',
-  implemented: true,
+  ampLevel: 'Tier I, Level A',
+  escatLevel: 'ESCAT I-A',
+  evidence: 'Strong',
   followUp: {
-    label: 'Follow-up at 3 months',
-    status: 'Alive',
-    notes: 'Partial response on CT; liver lesions smaller. Tolerating treatment well.',
+    label: 'Follow-up at 3 months (sample)',
+    status: 'Partial response on CT; liver lesions smaller.',
+    notes: 'Tolerating treatment well. Next scan in 3 months.',
   },
 };
 

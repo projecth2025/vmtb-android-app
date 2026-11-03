@@ -1,4 +1,3 @@
-import { FolderOpen } from 'lucide-react-native';
 import { FeatureScreenProps } from '../types';
 import { CasesScreen } from './cases/CasesScreen';
 import { CreateCaseScreen } from './cases/CreateCaseScreen';
@@ -11,7 +10,7 @@ import { MeetingLiveScreen } from './meetings/MeetingLiveScreen';
 import { ProfileScreen } from './profile/ProfileScreen';
 import { VerifyPhoneScreen } from './profile/VerifyPhoneScreen';
 import { FeedbackScreen } from './feedback/FeedbackScreen';
-import { EmptyPage } from './SamplePage';
+import { EmptyPage } from './EmptyPage';
 import { SampleCaseScreen } from './samples/SampleCaseScreen';
 import { SampleBoardScreen } from './samples/SampleBoardScreen';
 
@@ -71,9 +70,9 @@ export function FeatureRouter(props: FeatureScreenProps) {
     case 'feedback':
       return <FeedbackScreen {...props} />;
     case 'sample-case':
-      return <SampleCaseScreen onBack={props.onBack} />;
+      return <SampleCaseScreen onBack={props.onBack} role={props.role} profile={props.profile} />;
     case 'sample-board':
-      return <SampleBoardScreen onBack={props.onBack} />;
+      return <SampleBoardScreen onBack={props.onBack} role={props.role} onNavigate={props.onNavigate} />;
     default:
       return <EmptyPage {...common} title="Coming soon" />;
   }

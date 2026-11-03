@@ -11,18 +11,28 @@ export async function fetchQuestions(caseId: string): Promise<CaseQuestion[]> {
   return data ?? [];
 }
 
+/**
+ * Opinions for the case, scoped to `mtbId` when given. Web parity: if an MTB
+ * is selected but has no opinions of its own, fall back to the legacy rows
+ * written before MTB scoping existed (`mtb_id IS NULL`).
+ */
 export async function fetchOpinions(caseId: string, mtbId: string | null): Promise<CaseOpinion[]> {
   let query = supabase.from('case_opinions').select('*').eq('case_id', caseId).order('created_at');
   if (mtbId) query = query.eq('mtb_id', mtbId);
   const { data, error } = await query;
   if (error) throw error;
-  return data ?? [];
-}
-
-export async function fetchCaseMtbIds(caseId: string): Promise<string[]> {
-  const { data, error } = await supabase.from('mtb_cases').select('mtb_id').eq('case_id', caseId);
-  if (error) throw error;
-  return (data ?? []).map((row: { mtb_id: string }) => row.mtb_id);
+  if (data?.length) return data;
+  if (mtbId) {
+    const { data: legacy, error: legacyError } = await supabase
+      .from('case_opinions')
+      .select('*')
+      .eq('case_id', caseId)
+      .is('mtb_id', null)
+      .order('created_at');
+    if (legacyError) throw legacyError;
+    return legacy ?? [];
+  }
+  return [];
 }
 
 export async function submitQuestion(caseId: string, text: string) {
@@ -36,6 +46,7 @@ export async function submitOpinion(input: {
   text: string;
   mtbId: string;
   parentId: string | null;
+  questionId?: string | null;
 }): Promise<CaseOpinion> {
   const { data, error } = await supabase
     .from('case_opinions')
@@ -43,7 +54,7 @@ export async function submitOpinion(input: {
       case_id: input.caseId,
       user_id: input.userId,
       opinion_text: input.text.trim(),
-      question_id: null,
+      question_id: input.questionId ?? null,
       parent_id: input.parentId,
       mtb_id: input.mtbId,
     })
@@ -51,4 +62,12 @@ export async function submitOpinion(input: {
     .single();
   if (error) throw error;
   return data as CaseOpinion;
+}
+
+export async function updateOpinion(opinionId: string, text: string): Promise<void> {
+  const { error } = await supabase
+    .from('case_opinions')
+    .update({ opinion_text: text.trim() })
+    .eq('id', opinionId);
+  if (error) throw error;
 }

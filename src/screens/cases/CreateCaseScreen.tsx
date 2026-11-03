@@ -8,14 +8,14 @@ import { styles } from '../../theme/styles';
 import { FeatureScreenProps, PickedCaseFile } from '../../types';
 import { createAndProcessCase } from '../../lib/api/cases';
 import { ALLOWED_EXTENSIONS, errorMessage } from '../../lib/api/config';
+import { decodeBase64 } from '../../lib/base64';
 import { CANCER_TYPES, cancerTypeLabel, searchCancerTypes, OTHER_CANCER_TYPE_ID } from '../../data/cancerTypes';
 import { Button, ErrorBox, Field, Loading, Page } from '../../components/ui';
-import { VoiceInputButton } from '../../components/VoiceInputButton';
 
-function decodeBase64(value: string) {
-  const binary = globalThis.atob(value);
-  return Uint8Array.from(binary, (character) => character.charCodeAt(0));
-}
+/**
+ * Base64 → bytes: Hermes has no `atob`, so the shared helper (no Jitsi
+ * side-effect) backs PDF validation.
+ */
 
 export function CreateCaseScreen({ userId, role, profile, onBack, onNavigate }: FeatureScreenProps) {
   const [step, setStep] = useState<1 | 2>(1);
@@ -190,11 +190,6 @@ export function CreateCaseScreen({ userId, role, profile, onBack, onNavigate }: 
             onChangeText={setExplanation}
             placeholder="Explain the case in full detail…"
             multiline
-          />
-          <VoiceInputButton
-            userId={userId}
-            source="step2"
-            onTranscription={(text) => setExplanation((previous) => (previous ? previous + '\n\n' + text : text))}
           />
           <Text style={styles.muted}>{explanation.length} characters</Text>
           <View style={styles.row}>

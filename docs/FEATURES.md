@@ -24,7 +24,7 @@ Feature list for the Android client. The app replicates the web app feature-for-
   - Patient name (optional, defaults to Anonymous).
   - Cancer type selection (searchable list of 418 types, plus "Other" free text).
   - File upload (png, jpg, jpeg, doc, docx, ppt, pptx, pdf, txt; drag/drop on web, file picker on mobile), PDF page-count validation (max 50), duplicate-filename rejection.
-  - Case explanation text with optional voice dictation.
+  - Case explanation text.
   - Sample-case flow (local only, not uploaded or processed).
 - Auto-generated case name (abbreviation + 5 random digits), collision-checked.
 - Case detail page with five tabs: Summary, Reports, Opinions, Treatment, Settings.

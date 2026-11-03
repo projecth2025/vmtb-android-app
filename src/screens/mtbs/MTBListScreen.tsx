@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { Users } from 'lucide-react-native';
 import { styles } from '../../theme/styles';
 import { FeatureScreenProps, MTB } from '../../types';

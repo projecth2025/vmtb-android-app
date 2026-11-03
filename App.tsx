@@ -1,6 +1,8 @@
 import 'react-native-url-polyfill/auto';
+// Must run before the Jitsi DOM shim: see src/lib/locationPolyfill.ts.
+import './src/lib/locationPolyfill';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { ActivityIndicator, Text } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { Session } from '@supabase/supabase-js';
 import { StatusBar } from 'expo-status-bar';
@@ -100,6 +102,7 @@ export default function App() {
       else if (screen === 'mtb-detail') setScreen('mtbs');
       else if (screen === 'meeting-detail') setScreen('mtb-detail');
       else if (screen === 'verify-phone') setScreen('profile');
+      else if (screen === 'case-create' || screen === 'archived') setScreen('cases');
       else setScreen('home');
     };
     return (

@@ -1,8 +1,7 @@
 import { supabase } from '../supabase';
 import { CaseSummary, CaseDetail, Role, PickedCaseFile } from '../../types';
-import { API_BASE, ALLOWED_EXTENSIONS, makeUuid } from './config';
 import { getUploadConfig, uploadFile } from './uploads';
-import { startPipelineRun } from './pipeline';
+import { startPipelineRun, triggerConverterFilesToPng } from './pipeline';
 
 export async function fetchCases(
   userId: string,
@@ -132,7 +131,20 @@ export async function createAndProcessCase(input: {
     });
     if (error) throw error;
   }
-  await startPipelineRun(row.id, 'initial');
+  // The case exists from here on. A pipeline-start failure must not surface as
+  // "Could not create the case" (web parity) — users would retry and create
+  // duplicates. Fall back to the untracked converter trigger, and only fail
+  // loudly if even that cannot start processing.
+  try {
+    await startPipelineRun(row.id, 'initial');
+  } catch (e) {
+    console.error('[cases] start_initial_run failed, falling back to converter trigger', e);
+    try {
+      await triggerConverterFilesToPng(upload.requestId, row.id, input.explanation.trim());
+    } catch (fallbackError) {
+      throw new Error('The case was created, but processing could not be started. Open the case and retry.');
+    }
+  }
   return row.id as string;
 }
 
@@ -174,15 +186,6 @@ export async function saveSummary(
   return Array.isArray(data) ? data[0] : data;
 }
 
-export async function verifySummary(caseId: string, generation: number) {
-  const { data, error } = await supabase.rpc('verify_case_summary', {
-    p_case_id: caseId,
-    p_generation: generation,
-  });
-  if (error) throw error;
-  return Array.isArray(data) ? data[0] : data;
-}
-
 export async function deleteCaseCascade(caseId: string) {
   const steps = [
     supabase.from('case_opinions').delete().eq('case_id', caseId),
@@ -199,23 +202,3 @@ export async function deleteCaseCascade(caseId: string) {
   const result = await supabase.from('cases').delete().eq('id', caseId);
   if (result.error) throw result.error;
 }
-
-export async function fetchReports(requestId: string): Promise<{ filename: string; url: string }[]> {
-  const response = await fetch(`${API_BASE}/get-reports?request_id=${encodeURIComponent(requestId)}`);
-  if (!response.ok) throw new Error(`Could not load reports (${response.status}).`);
-  const data = await response.json();
-  return data.files ?? [];
-}
-
-export async function fetchReportUrl(requestId: string, filename: string): Promise<string> {
-  const response = await fetch(
-    `${API_BASE}/get-reports?request_id=${encodeURIComponent(requestId)}&filename=${encodeURIComponent(filename)}`,
-  );
-  if (!response.ok) throw new Error('Could not get a fresh document link.');
-  const data = await response.json();
-  const url = data.files?.find((file: { filename: string }) => file.filename === filename)?.url;
-  if (!url) throw new Error('This report is no longer available.');
-  return url as string;
-}
-
-export { ALLOWED_EXTENSIONS };

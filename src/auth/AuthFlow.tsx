@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
@@ -26,7 +26,7 @@ export interface AuthFlowProps {
   setProfile: (profile: Profile | null) => void;
 }
 
-export function AuthFlow({ user, screen, profile, setScreen, setProfile }: AuthFlowProps) {
+export function AuthFlow({ user, screen, setScreen, setProfile }: AuthFlowProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,38 +53,68 @@ export function AuthFlow({ user, screen, profile, setScreen, setProfile }: AuthF
   const google = async () => {
     setBusy(true);
     resetFormError();
+    // TEMP diagnostics for the OAuth redirect: watch the Metro/CLI log for `[auth]`.
+    const log = (...args: unknown[]) => console.log('[auth]', ...args);
     try {
       const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
       const appRedirect = Linking.createURL('auth/callback', { scheme: isExpoGo ? 'exp' : 'vmtb' });
+      log('executionEnvironment =', Constants.executionEnvironment, '| isExpoGo =', isExpoGo);
+      log('appRedirect (redirectTo) =', JSON.stringify(appRedirect));
+
       const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: appRedirect, skipBrowserRedirect: true },
       });
       if (oauthError || !data.url) throw oauthError || new Error('Could not start Google sign-in.');
       const browserUrl = data.url;
+      log('authorize URL =', browserUrl);
+
       let removeUrlListener: (() => void) | undefined;
       const callbackUrl = new Promise<string>((resolve) => {
         const subscription = Linking.addEventListener('url', ({ url }) => {
-          if (url.includes('code=')) {
+          log('inbound deep link =', JSON.stringify(url));
+          log('inbound matches appRedirect prefix =', url.startsWith(appRedirect));
+          // Accept both the success (`code=`) and failure (`error=`) redirects so
+          // Supabase's own reason surfaces instead of a generic cancellation.
+          if (url.includes('code=') || url.includes('error=')) {
             subscription.remove();
             resolve(url);
           }
         });
         removeUrlListener = () => subscription.remove();
       });
+
       const resultPromise = WebBrowser.openAuthSessionAsync(browserUrl, appRedirect);
+      resultPromise.then(
+        (v) => log('openAuthSessionAsync resolved =', JSON.stringify(v)),
+        (e) => log('openAuthSessionAsync REJECTED =', String(e)),
+      );
       const result = await Promise.race([
         resultPromise.then((value) => (value.type === 'success' ? value.url : '')),
         callbackUrl,
       ]);
       removeUrlListener?.();
+      log('race result =', JSON.stringify(result));
       if (!result) throw new Error('Google sign-in was cancelled or did not complete.');
       await WebBrowser.dismissBrowser();
-      const code = Linking.parse(result)?.queryParams?.code;
+
+      const parsed = Linking.parse(result);
+      log('parsed =', JSON.stringify(parsed));
+      const qp = parsed?.queryParams ?? {};
+      if (qp.error || qp.error_description) {
+        throw new Error(
+          `Google sign-in was refused: ${String(qp.error)} ${String(qp.error_description ?? '')}`.trim(),
+        );
+      }
+      const code = qp.code;
       if (typeof code !== 'string') throw new Error('Google did not return an authorization code.');
+      log('exchanging code…');
       const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
       if (exchangeError) throw exchangeError;
-    } catch (e) {
+      log('exchange OK — signed in');
+    } catch (e: any) {
+      log('ERROR name =', e?.name, '| code =', e?.code, '| message =', e?.message);
+      log('ERROR full =', e);
       showFailure(getError(e, 'Google sign-in failed. Please try again.'));
     } finally {
       setBusy(false);

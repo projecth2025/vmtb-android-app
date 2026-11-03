@@ -20,6 +20,16 @@ export type Profile = {
 
 export type CaseStatus = 'processing' | 'unverified' | 'verified' | 'failed';
 
+/** Frozen copy of the case written by the server when the owner verifies. */
+export interface VerifiedSnapshot {
+  summary?: string | null;
+  patient_age?: number | null;
+  patient_sex?: string | null;
+  cancer_type?: string | null;
+  notes?: { title?: string; content?: string } | null;
+  verified_at?: string | null;
+}
+
 export interface CaseSummary {
   id: string;
   case_name: string;
@@ -37,6 +47,7 @@ export interface CaseSummary {
   verified_generation?: number | null;
   summary_regeneration_count?: number;
   first_verified_at?: string | null;
+  verified_snapshot?: VerifiedSnapshot | null;
   treatment_plan?: string | null;
   owner_id?: string;
   request_id?: string | null;
@@ -98,13 +109,19 @@ export interface TreatmentPlan {
   id: string;
   case_id: string;
   vmtb_discussion_date?: string | null;
+  participants?: string[] | null;
   consensus_predominant_pathway?: string | null;
   consensus_therapy_recommendation?: string | null;
+  amp_level_of_evidence?: string | null;
+  escat_level?: string | null;
   overall_evidence_strength?: string | null;
   is_treatment_implemented?: boolean | null;
+  treatment_initiation_date?: string | null;
+  treatment_discontinuation_date?: string | null;
+  treatment_administered?: string | null;
   non_implementation_reason?: string | null;
-  alternative_treatment_plan?: string | null;
   non_implementation_notes?: string | null;
+  alternative_treatment_plan?: string | null;
 }
 
 export interface TreatmentFollowUp {
@@ -113,6 +130,7 @@ export interface TreatmentFollowUp {
   followup_date: string;
   disease_progression_date?: string | null;
   current_patient_status?: string | null;
+  discontinuation_or_ltfu_reason?: string | null;
   additional_clinical_notes?: string | null;
 }
 
