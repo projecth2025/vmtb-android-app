@@ -2,9 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const { withDangerousMod } = require('@expo/config-plugins');
 
-// R8 (release/minified builds) strips classes that are only reached through
-// JNI/reflection, which breaks react-native-webrtc at runtime. Keep the
-// affected class so the release APK builds and runs.
 const KEEP_RULES = `
 # react-native-webrtc / libwebrtc classes reached via JNI (R8 minification fix)
 -dontwarn org.webrtc.**
@@ -18,6 +15,8 @@ module.exports = function withProguardKeepRules(config) {
     'android',
     async (config) => {
       const projectRoot = config.modRequest.projectRoot;
+
+      // 1. Append keep/dontwarn rules to proguard-rules.pro
       const rulesPath = path.join(projectRoot, 'android', 'app', 'proguard-rules.pro');
       let contents = '';
       try {
@@ -25,9 +24,29 @@ module.exports = function withProguardKeepRules(config) {
       } catch {
         contents = '';
       }
-      if (!contents.includes('react-native-webrtc / libwebrtc')) {
+      if (!contents.includes('react-native-webrtc / libwebrtc classes reached via JNI')) {
         fs.writeFileSync(rulesPath, `${contents.trimEnd()}\n${KEEP_RULES.trim()}\n`);
       }
+
+      // 2. Disable R8 minification for release builds. Even with keep rules,
+      // minification has been crashing the release APK on startup; turning it
+      // off makes the preview build behave like a debug build (larger but
+      // stable) which is what we need for a demo.
+      const gradlePropsPath = path.join(projectRoot, 'android', 'gradle.properties');
+      let props = '';
+      try {
+        props = fs.readFileSync(gradlePropsPath, 'utf8');
+      } catch {
+        props = '';
+      }
+      if (!props.includes('android.enableMinifyInReleaseBuilds=false')) {
+        props = props.replace(/android\.enableMinifyInReleaseBuilds\s*=\s*true/, 'android.enableMinifyInReleaseBuilds=false');
+        if (!/android\.enableMinifyInReleaseBuilds/.test(props)) {
+          props = `${props.trimEnd()}\nandroid.enableMinifyInReleaseBuilds=false\n`;
+        }
+        fs.writeFileSync(gradlePropsPath, props);
+      }
+
       return config;
     },
   ]);
