@@ -36,6 +36,7 @@
       ],
       "@config-plugins/react-native-webrtc",
       "./plugins/with-jitsi-gradle-plugin-version",
+      "./plugins/with-proguard-keep-rules",
       "expo-status-bar"
     ],
     "owner": "harishbabu2007",
