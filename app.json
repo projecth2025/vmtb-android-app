@@ -6,10 +6,15 @@
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "scheme": "vmtb",
+    "icon": "./assets/icon.png",
     "android": {
       "package": "com.harishbabu2007.vmtb",
       "predictiveBackGestureEnabled": false,
       "softwareKeyboardLayoutMode": "resize",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#ffffff"
+      },
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
@@ -19,9 +24,16 @@
     },
     "plugins": [
       "expo-web-browser",
-      "expo-audio",
       "expo-sharing",
       "expo-asset",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
       "@config-plugins/react-native-webrtc",
       "./plugins/with-jitsi-gradle-plugin-version",
       "expo-status-bar"
