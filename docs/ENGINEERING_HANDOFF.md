@@ -1,9 +1,4 @@
-# vMTB Android — Engineering Handoff & Implementation Report
-
-**Audience:** future Android developers, reviewers, and maintainers of the vMTB mobile client.
-**Purpose:** explain what the app is, what was built against `docs/FEATURES.md`, how each part works, where to look when something breaks, how to build and ship it, and what is still missing.
-**Status of this document:** written against commit `3514eba` (branch `main`). Keep it updated when behaviour changes.
-
+# vMTB Android - Engineering Handoff & Implementation
 ---
 
 ## Table of contents
